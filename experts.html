@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ExpertIA — Annuaire des experts</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ===== page header ===== */
+.dir-head { background: var(--bg-2); border-bottom: 1px solid var(--line); padding: 48px 0 44px; }
+.crumb { font-size: 13.5px; color: var(--ink-faint); margin-bottom: 18px; display:flex; gap:8px; align-items:center;}
+.crumb a:hover { color: var(--ink-soft); }
+.dir-head h1 { font-size: 44px; }
+.dir-head p { color: var(--ink-soft); font-size: 17px; margin-top: 12px; max-width: 560px; }
+
+/* search bar on directory */
+.dir-search { margin-top: 26px; display: flex; gap: 12px; flex-wrap: wrap; }
+.dir-input {
+  flex: 1; min-width: 260px; display: flex; align-items: center; gap: 11px;
+  background: #fff; border: 1px solid var(--line); border-radius: var(--r-pill);
+  padding: 13px 20px; box-shadow: var(--sh-sm);
+}
+.dir-input svg { color: var(--terra); flex: none; }
+.dir-input input { border: none; outline: none; font-family: var(--sans);
+  font-size: 15px; width: 100%; background: transparent; color: var(--ink); }
+.dir-input input::placeholder { color: var(--ink-faint); }
+
+/* ===== layout ===== */
+.dir-body { padding: 40px 0 90px; }
+.dir-layout { display: grid; grid-template-columns: 270px 1fr; gap: 40px; align-items: start; }
+
+/* filters */
+.filters { position: sticky; top: 92px; }
+.filter-card { background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg);
+  padding: 8px 22px 18px; }
+.filter-card .fc-title { display:flex; justify-content:space-between; align-items:center;
+  padding: 18px 0 4px; }
+.filter-card .fc-title h4 { font-family: var(--sans); font-size: 16px; font-weight: 700; }
+.filter-card .fc-title a { font-size: 13px; color: var(--terra-deep); font-weight: 600; }
+.fgroup { padding: 18px 0; border-top: 1px solid var(--line-soft); }
+.fgroup h5 { font-family: var(--sans); font-size: 13px; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--ink-faint); font-weight: 700; margin: 0 0 14px; }
+.fopt { display: flex; align-items: center; gap: 11px; padding: 6px 0; cursor: pointer;
+  font-size: 14.5px; color: var(--ink-soft); }
+.fopt input { display: none; }
+.fbox { width: 19px; height: 19px; border-radius: 6px; border: 1.5px solid var(--line);
+  flex: none; display: grid; place-items: center; transition: .15s; background:#fff; }
+.fopt:hover .fbox { border-color: var(--terra); }
+.fopt input:checked + .fbox { background: var(--terra); border-color: var(--terra); }
+.fopt input:checked + .fbox svg { opacity: 1; }
+.fbox svg { opacity: 0; color: #fff; }
+.fopt .cnt { margin-left: auto; font-size: 12.5px; color: var(--ink-faint); }
+.fopt input:checked ~ .lbl { color: var(--ink); font-weight: 600; }
+
+.radio-row { display: flex; flex-direction: column; gap: 2px; }
+.range-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.range-pills .rp { font-size: 13px; padding: 7px 13px; border-radius: var(--r-pill);
+  border: 1px solid var(--line); background: #fff; cursor: pointer; color: var(--ink-soft);
+  transition: .15s; }
+.range-pills .rp:hover { border-color: var(--terra); color: var(--terra-deep); }
+.range-pills .rp.on { background: var(--terra-tint); border-color: var(--terra-soft);
+  color: var(--terra-deep); font-weight: 600; }
+
+/* results toolbar */
+.results-bar { display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 22px; gap: 16px; flex-wrap: wrap; }
+.results-bar .rc { font-size: 15px; color: var(--ink-soft); }
+.results-bar .rc b { color: var(--ink); font-weight: 700; }
+.sortby { display: flex; align-items: center; gap: 10px; }
+.sortby .lbl { font-size: 13.5px; color: var(--ink-faint); }
+.select {
+  display: inline-flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600;
+  background: #fff; border: 1px solid var(--line); border-radius: var(--r-pill);
+  padding: 9px 16px; cursor: pointer; color: var(--ink);
+}
+.active-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+.active-chips .chip { gap: 8px; }
+.active-chips .chip .x { cursor: pointer; opacity: .6; font-size: 13px; }
+
+/* result grid */
+.res-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 22px; }
+
+.pcard { background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg);
+  padding: 26px; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s; }
+.pcard:hover { transform: translateY(-4px); box-shadow: var(--sh-lg); border-color: var(--terra-soft); }
+.pc-top { display: flex; gap: 16px; align-items: flex-start; }
+.pc-top .avatar { width: 66px; height: 66px; font-size: 22px; }
+.pc-id { flex: 1; }
+.pc-name-row { display: flex; align-items: center; gap: 9px; }
+.pc-name { font-family: var(--serif); font-weight: 600; font-size: 20px; }
+.pc-verif { color: var(--terra); display: inline-flex; }
+.pc-role { font-size: 14px; color: var(--terra-deep); font-weight: 600; margin-top: 2px; }
+.pc-meta { display: flex; align-items: center; gap: 14px; font-size: 13px;
+  color: var(--ink-soft); margin-top: 9px; }
+.pc-meta span { display: inline-flex; align-items: center; gap: 5px; }
+.pc-meta svg { color: var(--ink-faint); }
+.pc-bio { font-size: 14.5px; color: var(--ink-soft); margin-top: 18px; line-height: 1.55; }
+.pc-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
+.pc-tags .chip { font-size: 11.5px; padding: 4px 11px; }
+.pc-foot { display: flex; align-items: center; justify-content: space-between;
+  margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line-soft); }
+.pc-price b { font-size: 19px; } .pc-price span { font-size: 13px; color: var(--ink-faint); }
+.pc-foot .rating { font-size: 14px; }
+
+/* pagination */
+.pagination { display: flex; justify-content: center; align-items: center; gap: 8px;
+  margin-top: 50px; }
+.pagination a { min-width: 42px; height: 42px; border-radius: 12px; display: grid;
+  place-items: center; font-weight: 600; font-size: 14.5px; color: var(--ink-soft);
+  border: 1px solid transparent; transition: .15s; }
+.pagination a:hover { border-color: var(--line); background: #fff; }
+.pagination a.on { background: var(--terra); color: #fff; }
+.pagination .pg-arrow { color: var(--ink); }
+
+@media (max-width: 980px) {
+  .dir-head h1 { font-size: 32px; }
+  .dir-layout { grid-template-columns: 1fr; gap: 0; }
+  .filters { position: static; margin-bottom: 24px; }
+  .res-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============== NAV ============== -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">
+      <span class="mark"><svg width="18" height="18" viewBox="0 0 24 24" class="icon" stroke="#fff" stroke-width="2"><path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18"/></svg></span>
+      Expert<b>IA</b>
+    </a>
+    <nav class="nav-links">
+      <a href="experts.html" class="active">Trouver un expert</a>
+      <a href="index.html#entreprises">Pour les entreprises</a>
+      <a href="index.html#devenir">Devenir expert</a>
+      <a href="index.html#tarifs">Tarifs</a>
+    </nav>
+    <div class="nav-right">
+      <a class="link" href="#">Connexion</a>
+      <a class="btn btn-primary btn-sm" href="#">Je suis expert</a>
+      <button class="nav-burger" aria-label="Menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" class="icon" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============== DIR HEADER ============== -->
+<section class="dir-head">
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">Accueil</a> <span>/</span> <span style="color:var(--ink-soft)">Annuaire des experts</span></div>
+    <h1>Annuaire des experts IA</h1>
+    <p>1 248 diplômés vérifiés, prêts à implémenter l'IA, former vos équipes ou vous accompagner.</p>
+    <div class="dir-search">
+      <div class="dir-input">
+        <svg width="18" height="18" viewBox="0 0 24 24" class="icon"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-4.3-4.3"/></svg>
+        <input type="text" placeholder="Compétence, technologie ou intitulé de poste…">
+      </div>
+      <div class="dir-input" style="max-width:240px;flex:0 0 240px">
+        <svg width="18" height="18" viewBox="0 0 24 24" class="icon"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        <input type="text" placeholder="Ville ou Remote">
+      </div>
+      <button class="btn btn-primary btn-lg">Rechercher</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============== BODY ============== -->
+<section class="dir-body">
+  <div class="wrap dir-layout">
+
+    <!-- FILTERS -->
+    <aside class="filters">
+      <div class="filter-card">
+        <div class="fc-title">
+          <h4>Filtres</h4>
+          <a href="#">Réinitialiser</a>
+        </div>
+
+        <div class="fgroup">
+          <h5>Spécialité IA</h5>
+          <label class="fopt"><input type="checkbox" checked><span class="fbox"><svg width="12" height="12" viewBox="0 0 24 24" class="icon" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span><span class="lbl">Machine Learning</span><span class="cnt">312</span></label>
+          <label class="fopt"><input type="checkbox"><span class="fbox"><svg width="12" height="12" viewBox="0 0 24 24" class="icon" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span><span class="lbl">LLM &amp; IA Générative</span><span class="cnt">268</span></label>
+          <label class="fopt"><input type="checkbox"><span class="fbox"><svg width="12" height="12" viewBox="0 0 24 24" class="icon" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span><span class="lbl">Computer Vision</span><span class="cnt">141</span></label>
+          <label class="fopt"><input type="checkbox"><span class="fbox"><svg width="12" height="12" viewBox="0 0 24 24" class="icon" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span><span class="lbl">NLP</span><span class="cnt">119</span></label>
+          <label class="fopt"><input type="checkbox"><span class="fbox"><svg width="12" height="12" viewBox="0 0 24 24" class="icon" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span><span class="lbl">MLOps &amp; Data Eng.</span><span class="cnt">97</span></label>
+          <label class="fopt"><input type="checkbox"><span class="fbox"><svg width="12" height="12" viewBox="0 0 24 24" class="icon" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span><span class="lbl">IA &amp; Stratégie</span><span class="cnt">84</span></label>
+        </div>
+
+        <div class="fgroup">
+          <h5>Disponibilité</h5>
+          <div class="radio-row">
+            <label class="fopt"><input type="checkbox" checked><span class="fbox"><svg width="12" height="12" viewBox="0 0 24 24" class="icon" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span><span class="lbl">Disponible maintenant</span></label>
+            <label class="fopt"><input type="checkbox"><span class="fbox"><svg width="12" height="12" viewBox="0 0 24 24" class="icon" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span><span class="lbl">Sous 2 semaines</span></label>
+          </div>
+        </div>
+
+        <div class="fgroup">
+          <h5>Expérience</h5>
+          <div class="range-pills">
+            <span class="rp">1–3 ans</span>
+            <span class="rp on">3–6 ans</span>
+            <span class="rp">6–10 ans</span>
+            <span class="rp">10 ans +</span>
+          </div>
+        </div>
+
+        <div class="fgroup">
+          <h5>Tarif journalier</h5>
+          <div class="range-pills">
+            <span class="rp">&lt; 300 €</span>
+            <span class="rp on">300–500 €</span>
+            <span class="rp">500 € +</span>
+          </div>
+        </div>
+
+        <div class="fgroup" style="border-bottom:0;padding-bottom:4px">
+          <h5>Ville</h5>
+          <div class="radio-row">
+            <label class="fopt"><input type="checkbox"><span class="fbox"><svg width="12" height="12" viewBox="0 0 24 24" class="icon" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span><span class="lbl">Paris</span><span class="cnt">418</span></label>
+            <label class="fopt"><input type="checkbox"><span class="fbox"><svg width="12" height="12" viewBox="0 0 24 24" class="icon" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span><span class="lbl">Lyon</span><span class="cnt">162</span></label>
+            <label class="fopt"><input type="checkbox"><span class="fbox"><svg width="12" height="12" viewBox="0 0 24 24" class="icon" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span><span class="lbl">Remote</span><span class="cnt">503</span></label>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RESULTS -->
+    <div class="results">
+      <div class="results-bar">
+        <div class="rc"><b>1 248</b> experts correspondent à votre recherche</div>
+        <div class="sortby">
+          <span class="lbl">Trier par</span>
+          <span class="select">Pertinence
+            <svg width="14" height="14" viewBox="0 0 24 24" class="icon"><path d="M6 9l6 6 6-6"/></svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="active-chips">
+        <span class="chip">Machine Learning <span class="x">✕</span></span>
+        <span class="chip">Disponible maintenant <span class="x">✕</span></span>
+        <span class="chip">3–6 ans <span class="x">✕</span></span>
+        <span class="chip">300–500 € <span class="x">✕</span></span>
+      </div>
+
+      <div class="res-grid">
+
+        <a class="pcard" href="profil.html">
+          <div class="pc-top">
+            <span class="avatar av-1">AK</span>
+            <div class="pc-id">
+              <div class="pc-name-row">
+                <span class="pc-name">Amélie Khan</span>
+                <span class="pc-verif"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 1.5 2.6-.4 1 2.5 2.3 1.3-.5 2.6 1.5 2.2-1.5 2.2.5 2.6-2.3 1.3-1 2.5-2.6-.4L12 22l-2.2-1.5-2.6.4-1-2.5-2.3-1.3.5-2.6L2.9 12l1.5-2.2-.5-2.6 2.3-1.3 1-2.5 2.6.4z"/><path d="M8.5 12l2.3 2.3 4.7-4.7" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+              <div class="pc-role">Lead Data Scientist</div>
+              <div class="pc-meta">
+                <span><svg width="13" height="13" viewBox="0 0 24 24" class="icon"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Paris</span>
+                <span><svg width="13" height="13" viewBox="0 0 24 24" class="icon"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>8 ans</span>
+              </div>
+            </div>
+            <span class="badge badge-avail"><span class="dot"></span>Dispo</span>
+          </div>
+          <p class="pc-bio">Ex-Hugging Face. J'aide les scale-ups à mettre des modèles en production sans dette technique.</p>
+          <div class="pc-tags"><span class="chip">Machine Learning</span><span class="chip chip-muted">MLOps</span><span class="chip chip-muted">Computer Vision</span></div>
+          <div class="pc-foot">
+            <span class="pc-price"><b>450 €</b> <span>/ jour</span></span>
+            <span class="rating"><span class="star">★</span> 4,9 <span class="count">(64 avis)</span></span>
+          </div>
+        </a>
+
+        <a class="pcard" href="profil.html">
+          <div class="pc-top">
+            <span class="avatar av-6">YN</span>
+            <div class="pc-id">
+              <div class="pc-name-row">
+                <span class="pc-name">Yanis Nadir</span>
+                <span class="pc-verif"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 1.5 2.6-.4 1 2.5 2.3 1.3-.5 2.6 1.5 2.2-1.5 2.2.5 2.6-2.3 1.3-1 2.5-2.6-.4L12 22l-2.2-1.5-2.6.4-1-2.5-2.3-1.3.5-2.6L2.9 12l1.5-2.2-.5-2.6 2.3-1.3 1-2.5 2.6.4z"/><path d="M8.5 12l2.3 2.3 4.7-4.7" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+              <div class="pc-role">LLM &amp; RAG Engineer</div>
+              <div class="pc-meta">
+                <span><svg width="13" height="13" viewBox="0 0 24 24" class="icon"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Remote</span>
+                <span><svg width="13" height="13" viewBox="0 0 24 24" class="icon"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>5 ans</span>
+              </div>
+            </div>
+            <span class="badge badge-avail"><span class="dot"></span>Dispo</span>
+          </div>
+          <p class="pc-bio">Je conçois des assistants et moteurs de recherche augmentés (RAG) fiables, pensés pour la production.</p>
+          <div class="pc-tags"><span class="chip">LLM</span><span class="chip chip-muted">RAG</span><span class="chip chip-muted">LangChain</span></div>
+          <div class="pc-foot">
+            <span class="pc-price"><b>520 €</b> <span>/ jour</span></span>
+            <span class="rating"><span class="star">★</span> 5,0 <span class="count">(38 avis)</span></span>
+          </div>
+        </a>
+
+        <a class="pcard" href="profil.html">
+          <div class="pc-top">
+            <span class="avatar av-4">SM</span>
+            <div class="pc-id">
+              <div class="pc-name-row">
+                <span class="pc-name">Sofia Marek</span>
+                <span class="pc-verif"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 1.5 2.6-.4 1 2.5 2.3 1.3-.5 2.6 1.5 2.2-1.5 2.2.5 2.6-2.3 1.3-1 2.5-2.6-.4L12 22l-2.2-1.5-2.6.4-1-2.5-2.3-1.3.5-2.6L2.9 12l1.5-2.2-.5-2.6 2.3-1.3 1-2.5 2.6.4z"/><path d="M8.5 12l2.3 2.3 4.7-4.7" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+              <div class="pc-role">Experte IA Générative</div>
+              <div class="pc-meta">
+                <span><svg width="13" height="13" viewBox="0 0 24 24" class="icon"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Lyon</span>
+                <span><svg width="13" height="13" viewBox="0 0 24 24" class="icon"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>6 ans</span>
+              </div>
+            </div>
+            <span class="badge badge-soon"><span class="dot"></span>2 sem.</span>
+          </div>
+          <p class="pc-bio">Formatrice certifiée. J'embarque vos équipes métier sur l'IA générative, du prompt au déploiement.</p>
+          <div class="pc-tags"><span class="chip">IA Générative</span><span class="chip chip-muted">Formation</span><span class="chip chip-muted">Prompt Eng.</span></div>
+          <div class="pc-foot">
+            <span class="pc-price"><b>380 €</b> <span>/ jour</span></span>
+            <span class="rating"><span class="star">★</span> 4,8 <span class="count">(51 avis)</span></span>
+          </div>
+        </a>
+
+        <a class="pcard" href="profil.html">
+          <div class="pc-top">
+            <span class="avatar av-3">TL</span>
+            <div class="pc-id">
+              <div class="pc-name-row">
+                <span class="pc-name">Thomas Lefèvre</span>
+                <span class="pc-verif"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 1.5 2.6-.4 1 2.5 2.3 1.3-.5 2.6 1.5 2.2-1.5 2.2.5 2.6-2.3 1.3-1 2.5-2.6-.4L12 22l-2.2-1.5-2.6.4-1-2.5-2.3-1.3.5-2.6L2.9 12l1.5-2.2-.5-2.6 2.3-1.3 1-2.5 2.6.4z"/><path d="M8.5 12l2.3 2.3 4.7-4.7" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+              <div class="pc-role">MLOps &amp; Data Engineer</div>
+              <div class="pc-meta">
+                <span><svg width="13" height="13" viewBox="0 0 24 24" class="icon"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Remote</span>
+                <span><svg width="13" height="13" viewBox="0 0 24 24" class="icon"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>9 ans</span>
+              </div>
+            </div>
+            <span class="badge badge-avail"><span class="dot"></span>Dispo</span>
+          </div>
+          <p class="pc-bio">Je construis des plateformes data robustes et des pipelines de modèles scalables sur le cloud.</p>
+          <div class="pc-tags"><span class="chip">MLOps</span><span class="chip chip-muted">Kubernetes</span><span class="chip chip-muted">AWS</span></div>
+          <div class="pc-foot">
+            <span class="pc-price"><b>560 €</b> <span>/ jour</span></span>
+            <span class="rating"><span class="star">★</span> 4,9 <span class="count">(42 avis)</span></span>
+          </div>
+        </a>
+
+        <a class="pcard" href="profil.html">
+          <div class="pc-top">
+            <span class="avatar av-7">CB</span>
+            <div class="pc-id">
+              <div class="pc-name-row">
+                <span class="pc-name">Clara Bonnet</span>
+                <span class="pc-verif"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 1.5 2.6-.4 1 2.5 2.3 1.3-.5 2.6 1.5 2.2-1.5 2.2.5 2.6-2.3 1.3-1 2.5-2.6-.4L12 22l-2.2-1.5-2.6.4-1-2.5-2.3-1.3.5-2.6L2.9 12l1.5-2.2-.5-2.6 2.3-1.3 1-2.5 2.6.4z"/><path d="M8.5 12l2.3 2.3 4.7-4.7" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+              <div class="pc-role">Consultante IA &amp; Stratégie</div>
+              <div class="pc-meta">
+                <span><svg width="13" height="13" viewBox="0 0 24 24" class="icon"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Paris</span>
+                <span><svg width="13" height="13" viewBox="0 0 24 24" class="icon"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>7 ans</span>
+              </div>
+            </div>
+            <span class="badge badge-avail"><span class="dot"></span>Dispo</span>
+          </div>
+          <p class="pc-bio">J'aide les comités de direction à bâtir leur feuille de route IA et à prioriser les bons cas d'usage.</p>
+          <div class="pc-tags"><span class="chip">IA &amp; Stratégie</span><span class="chip chip-muted">Cadrage</span><span class="chip chip-muted">Gouvernance</span></div>
+          <div class="pc-foot">
+            <span class="pc-price"><b>620 €</b> <span>/ jour</span></span>
+            <span class="rating"><span class="star">★</span> 5,0 <span class="count">(29 avis)</span></span>
+          </div>
+        </a>
+
+        <a class="pcard" href="profil.html">
+          <div class="pc-top">
+            <span class="avatar av-8">MR</span>
+            <div class="pc-id">
+              <div class="pc-name-row">
+                <span class="pc-name">Marc Rossi</span>
+                <span class="pc-verif"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 1.5 2.6-.4 1 2.5 2.3 1.3-.5 2.6 1.5 2.2-1.5 2.2.5 2.6-2.3 1.3-1 2.5-2.6-.4L12 22l-2.2-1.5-2.6.4-1-2.5-2.3-1.3.5-2.6L2.9 12l1.5-2.2-.5-2.6 2.3-1.3 1-2.5 2.6.4z"/><path d="M8.5 12l2.3 2.3 4.7-4.7" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+              <div class="pc-role">Computer Vision Engineer</div>
+              <div class="pc-meta">
+                <span><svg width="13" height="13" viewBox="0 0 24 24" class="icon"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Toulouse</span>
+                <span><svg width="13" height="13" viewBox="0 0 24 24" class="icon"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>4 ans</span>
+              </div>
+            </div>
+            <span class="badge badge-soon"><span class="dot"></span>2 sem.</span>
+          </div>
+          <p class="pc-bio">Spécialiste détection et segmentation d'images pour l'industrie, la santé et la logistique.</p>
+          <div class="pc-tags"><span class="chip">Computer Vision</span><span class="chip chip-muted">PyTorch</span><span class="chip chip-muted">Edge AI</span></div>
+          <div class="pc-foot">
+            <span class="pc-price"><b>420 €</b> <span>/ jour</span></span>
+            <span class="rating"><span class="star">★</span> 4,7 <span class="count">(33 avis)</span></span>
+          </div>
+        </a>
+
+      </div>
+
+      <div class="pagination">
+        <a class="pg-arrow" href="#"><svg width="16" height="16" viewBox="0 0 24 24" class="icon"><path d="M15 6l-6 6 6 6"/></svg></a>
+        <a class="on" href="#">1</a>
+        <a href="#">2</a>
+        <a href="#">3</a>
+        <a href="#">…</a>
+        <a href="#">21</a>
+        <a class="pg-arrow" href="#"><svg width="16" height="16" viewBox="0 0 24 24" class="icon"><path d="M9 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============== FOOTER ============== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="brand-col">
+      <div class="brand">
+        <span class="mark"><svg width="18" height="18" viewBox="0 0 24 24" class="icon" stroke="#fff" stroke-width="2"><path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18"/></svg></span>
+        Expert<b>IA</b>
+      </div>
+      <p class="footer-tag">La marketplace qui relie les entreprises aux meilleurs experts diplômés en intelligence artificielle.</p>
+    </div>
+    <div>
+      <h5>Entreprises</h5>
+      <a href="experts.html">Trouver un expert</a>
+      <a href="#">Implémenter l'IA</a>
+      <a href="#">Former mes équipes</a>
+      <a href="#">Tarifs</a>
+    </div>
+    <div>
+      <h5>Experts</h5>
+      <a href="#">Devenir expert</a>
+      <a href="#">Académies partenaires</a>
+      <a href="#">Charte qualité</a>
+      <a href="#">Ressources</a>
+    </div>
+    <div>
+      <h5>Société</h5>
+      <a href="#">À propos</a>
+      <a href="#">Blog</a>
+      <a href="#">Contact</a>
+      <a href="#">Mentions légales</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 ExpertIA — Conçu à Paris.</span>
+    <div class="socials"><span>in</span><span>X</span><span>@</span></div>
+  </div>
+</footer>
+
+</body>
+</html>
