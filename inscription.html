@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ExpertIA — Devenir expert</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ===== page header ===== */
+.ins-hero { background: var(--navy); padding: 64px 0 72px; }
+.ins-hero .eyebrow { color: #E08B68; }
+.ins-hero .eyebrow::before { background: #E08B68; }
+.ins-hero h1 { font-size: 52px; color: #fff; margin: 18px 0 0; max-width: 640px; }
+.ins-hero h1 .ital { font-style: italic; color: #E08B68; font-weight: 500; }
+.ins-hero p { color: #9FAAB4; font-size: 18px; margin-top: 18px; max-width: 520px; line-height: 1.6; }
+
+.ins-perks { display: flex; gap: 28px; margin-top: 40px; flex-wrap: wrap; }
+.perk { display: flex; align-items: center; gap: 10px; color: #C9D0D7; font-size: 14.5px; }
+.perk svg { color: #E08B68; flex: none; }
+
+/* ===== layout ===== */
+.ins-body { padding: 72px 0 96px; }
+.ins-layout { display: grid; grid-template-columns: 1fr 380px; gap: 64px; align-items: start; }
+
+/* ===== form ===== */
+.ins-form-wrap { background: #fff; border: 1px solid var(--line); border-radius: var(--r-xl);
+  padding: 48px 44px; box-shadow: var(--sh); }
+.ins-form-wrap h2 { font-size: 30px; margin-bottom: 8px; }
+.ins-form-wrap .sub { color: var(--ink-soft); font-size: 15.5px; margin-bottom: 36px; }
+
+.form-section { margin-bottom: 32px; }
+.form-section h4 { font-family: var(--sans); font-size: 12px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint);
+  margin: 0 0 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line-soft); }
+
+.f-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.f-field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 18px; }
+.f-field:last-child { margin-bottom: 0; }
+.f-field label { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.f-field label .req { color: var(--terra); margin-left: 2px; }
+.f-field input, .f-field select, .f-field textarea {
+  font-family: var(--sans); font-size: 15px; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 12px 16px; outline: none; transition: border-color .15s, box-shadow .15s, background .15s;
+  width: 100%;
+}
+.f-field input::placeholder, .f-field textarea::placeholder { color: var(--ink-faint); }
+.f-field input:focus, .f-field select:focus, .f-field textarea:focus {
+  border-color: var(--terra); box-shadow: 0 0 0 3px rgba(189,93,58,.1); background: #fff;
+}
+.f-field textarea { resize: vertical; }
+.f-field .hint { font-size: 12.5px; color: var(--ink-faint); margin-top: 4px; }
+
+.specialite-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.spe-opt { display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+  border: 1.5px solid var(--line); border-radius: var(--r); cursor: pointer;
+  font-size: 14px; color: var(--ink-soft); transition: .15s; background: var(--bg); }
+.spe-opt input { display: none; }
+.spe-opt:hover { border-color: var(--terra-soft); color: var(--ink); }
+.spe-opt input:checked ~ span { color: var(--ink); font-weight: 600; }
+.spe-opt:has(input:checked) { border-color: var(--terra); background: var(--terra-tint); }
+.spe-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line);
+  flex: none; transition: .15s; }
+.spe-opt:has(input:checked) .spe-dot { background: var(--terra); }
+
+.submit-zone { margin-top: 36px; }
+.submit-zone .btn { width: 100%; justify-content: center; font-size: 17px; padding: 18px; }
+.submit-note { display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 12.5px; color: var(--ink-faint); margin-top: 16px; }
+.submit-note svg { color: var(--green); }
+
+/* ===== sidebar ===== */
+.ins-sidebar { position: sticky; top: 92px; }
+
+.ins-steps { background: var(--bg-2); border: 1px solid var(--line);
+  border-radius: var(--r-lg); padding: 30px 28px; margin-bottom: 22px; }
+.ins-steps h3 { font-size: 20px; margin-bottom: 24px; }
+.ins-step { display: flex; gap: 16px; margin-bottom: 22px; }
+.ins-step:last-child { margin-bottom: 0; }
+.step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--terra);
+  color: #fff; font-family: var(--mono); font-size: 13px; font-weight: 600;
+  display: grid; place-items: center; flex: none; }
+.step-txt h5 { font-family: var(--sans); font-size: 15px; font-weight: 700; margin: 0 0 4px; }
+.step-txt p { font-size: 13.5px; color: var(--ink-soft); margin: 0; }
+
+.ins-card { background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg);
+  padding: 24px 26px; }
+.ins-card h4 { font-family: var(--sans); font-size: 13px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 18px; }
+.ins-stat { display: flex; align-items: baseline; gap: 10px; padding: 10px 0;
+  border-bottom: 1px solid var(--line-soft); }
+.ins-stat:last-child { border-bottom: 0; }
+.ins-stat .n { font-family: var(--serif); font-size: 28px; font-weight: 500; color: var(--ink); }
+.ins-stat .l { font-size: 14px; color: var(--ink-soft); }
+
+/* success state */
+.form-success { display: none; text-align: center; padding: 48px 24px; }
+.form-success .check { width: 72px; height: 72px; border-radius: 50%;
+  background: var(--terra-tint); color: var(--terra);
+  display: grid; place-items: center; margin: 0 auto 24px; }
+.form-success h3 { font-size: 28px; margin-bottom: 12px; }
+.form-success p { color: var(--ink-soft); font-size: 16px; }
+
+@media (max-width: 980px) {
+  .ins-hero h1 { font-size: 36px; }
+  .ins-layout { grid-template-columns: 1fr; gap: 36px; }
+  .ins-sidebar { position: static; }
+  .f-row { grid-template-columns: 1fr; }
+  .ins-form-wrap { padding: 28px 22px; }
+  .specialite-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============== NAV ============== -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">
+      <span class="mark"><svg width="18" height="18" viewBox="0 0 24 24" class="icon" stroke="#fff" stroke-width="2"><path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18"/></svg></span>
+      Expert<b>IA</b>
+    </a>
+    <nav class="nav-links">
+      <a href="experts.html">Trouver un expert</a>
+      <a href="index.html#entreprises">Pour les entreprises</a>
+      <a href="inscription.html" class="active">Devenir expert</a>
+      <a href="index.html#tarifs">Tarifs</a>
+    </nav>
+    <div class="nav-right">
+      <a class="link" href="#">Connexion</a>
+      <a class="btn btn-primary btn-sm" href="inscription.html">Je suis expert</a>
+      <button class="nav-burger" aria-label="Menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" class="icon" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============== HERO ============== -->
+<section class="ins-hero">
+  <div class="wrap">
+    <span class="eyebrow">Rejoindre la plateforme</span>
+    <h1>Devenez un expert<br><span class="ital">reconnu</span></h1>
+    <p>Rejoignez 1 200 diplômés qui trouvent des missions IA grâce à ExpertIA. Inscription gratuite, missions qualifiées, paiement sécurisé.</p>
+    <div class="ins-perks">
+      <div class="perk"><svg width="16" height="16" viewBox="0 0 24 24" class="icon"><path d="M20 6L9 17l-5-5"/></svg>Inscription 100% gratuite</div>
+      <div class="perk"><svg width="16" height="16" viewBox="0 0 24 24" class="icon"><path d="M20 6L9 17l-5-5"/></svg>Réponse sous 48h</div>
+      <div class="perk"><svg width="16" height="16" viewBox="0 0 24 24" class="icon"><path d="M20 6L9 17l-5-5"/></svg>Missions dès validation</div>
+      <div class="perk"><svg width="16" height="16" viewBox="0 0 24 24" class="icon"><path d="M20 6L9 17l-5-5"/></svg>Tarif libre, vous décidez</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== BODY ============== -->
+<section class="ins-body">
+  <div class="wrap ins-layout">
+
+    <!-- FORM -->
+    <div>
+      <div class="ins-form-wrap">
+        <h2>Votre candidature</h2>
+        <p class="sub">Remplissez ce formulaire, on revient vers vous sous 48h pour valider votre profil.</p>
+
+        <form name="inscription-expert" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+          <input type="hidden" name="form-name" value="inscription-expert">
+          <p style="display:none"><input name="bot-field"></p>
+
+          <!-- Identité -->
+          <div class="form-section">
+            <h4>Votre identité</h4>
+            <div class="f-row">
+              <div class="f-field">
+                <label>Prénom <span class="req">*</span></label>
+                <input type="text" name="prenom" placeholder="Amélie" required>
+              </div>
+              <div class="f-field">
+                <label>Nom <span class="req">*</span></label>
+                <input type="text" name="nom" placeholder="Khan" required>
+              </div>
+            </div>
+            <div class="f-row">
+              <div class="f-field">
+                <label>Email professionnel <span class="req">*</span></label>
+                <input type="email" name="email" placeholder="amelie@mail.com" required>
+              </div>
+              <div class="f-field">
+                <label>Ville <span class="req">*</span></label>
+                <input type="text" name="ville" placeholder="Paris / Remote" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Expertise -->
+          <div class="form-section">
+            <h4>Votre expertise IA</h4>
+            <div class="f-field">
+              <label>Spécialité principale <span class="req">*</span></label>
+              <div class="specialite-grid">
+                <label class="spe-opt"><input type="radio" name="specialite" value="Machine Learning" required><span class="spe-dot"></span><span>Machine Learning</span></label>
+                <label class="spe-opt"><input type="radio" name="specialite" value="LLM & IA Générative"><span class="spe-dot"></span><span>LLM &amp; IA Générative</span></label>
+                <label class="spe-opt"><input type="radio" name="specialite" value="Computer Vision"><span class="spe-dot"></span><span>Computer Vision</span></label>
+                <label class="spe-opt"><input type="radio" name="specialite" value="NLP"><span class="spe-dot"></span><span>NLP</span></label>
+                <label class="spe-opt"><input type="radio" name="specialite" value="MLOps & Data Eng."><span class="spe-dot"></span><span>MLOps &amp; Data Eng.</span></label>
+                <label class="spe-opt"><input type="radio" name="specialite" value="IA & Stratégie"><span class="spe-dot"></span><span>IA &amp; Stratégie</span></label>
+              </div>
+            </div>
+            <div class="f-row" style="margin-top:18px">
+              <div class="f-field">
+                <label>Années d'expérience <span class="req">*</span></label>
+                <select name="experience" required>
+                  <option value="">Sélectionner</option>
+                  <option value="1-3">1 à 3 ans</option>
+                  <option value="3-6">3 à 6 ans</option>
+                  <option value="6-10">6 à 10 ans</option>
+                  <option value="10+">10 ans et plus</option>
+                </select>
+              </div>
+              <div class="f-field">
+                <label>Tarif journalier souhaité (€) <span class="req">*</span></label>
+                <input type="number" name="tarif" placeholder="ex: 450" min="100" max="2000" required>
+                <span class="hint">Vous pourrez le modifier à tout moment.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formation -->
+          <div class="form-section">
+            <h4>Votre formation</h4>
+            <div class="f-field">
+              <label>Académie ou formation IA suivie <span class="req">*</span></label>
+              <input type="text" name="academie" placeholder="ex: Académie IA Paris, DataScientest, OpenClassrooms…" required>
+            </div>
+            <div class="f-field">
+              <label>Lien LinkedIn ou portfolio</label>
+              <input type="url" name="linkedin" placeholder="https://linkedin.com/in/votre-profil">
+            </div>
+          </div>
+
+          <!-- Bio -->
+          <div class="form-section">
+            <h4>Votre présentation</h4>
+            <div class="f-field">
+              <label>Décrivez votre profil en 2-3 phrases <span class="req">*</span></label>
+              <textarea name="bio" rows="4" placeholder="Ex : Lead Data Scientist avec 5 ans d'expérience, je me spécialise dans le déploiement de modèles NLP en production pour les entreprises du secteur financier…" required></textarea>
+            </div>
+          </div>
+
+          <div class="submit-zone">
+            <button type="submit" class="btn btn-primary btn-lg">
+              Envoyer ma candidature
+              <svg width="16" height="16" viewBox="0 0 24 24" class="icon arr"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            </button>
+            <div class="submit-note">
+              <svg width="14" height="14" viewBox="0 0 24 24" class="icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Vos données sont traitées de façon confidentielle.
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="ins-sidebar">
+      <div class="ins-steps">
+        <h3>Comment ça marche ?</h3>
+        <div class="ins-step">
+          <span class="step-num">01</span>
+          <div class="step-txt">
+            <h5>Vous candidatez</h5>
+            <p>Remplissez le formulaire en 5 minutes. C'est gratuit et sans engagement.</p>
+          </div>
+        </div>
+        <div class="ins-step">
+          <span class="step-num">02</span>
+          <div class="step-txt">
+            <h5>On vérifie votre profil</h5>
+            <p>Notre équipe valide votre diplôme et votre expérience sous 48h.</p>
+          </div>
+        </div>
+        <div class="ins-step">
+          <span class="step-num">03</span>
+          <div class="step-txt">
+            <h5>Vous recevez des missions</h5>
+            <p>Votre profil est publié et les entreprises peuvent vous contacter directement.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ins-card">
+        <h4>La plateforme en chiffres</h4>
+        <div class="ins-stat">
+          <span class="n">340+</span>
+          <span class="l">entreprises actives</span>
+        </div>
+        <div class="ins-stat">
+          <span class="n">48h</span>
+          <span class="l">délai moyen de mise en relation</span>
+        </div>
+        <div class="ins-stat">
+          <span class="n">4,9/5</span>
+          <span class="l">note moyenne des experts</span>
+        </div>
+        <div class="ins-stat">
+          <span class="n">0 €</span>
+          <span class="l">frais d'inscription</span>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</section>
+
+<!-- ============== FOOTER ============== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="brand-col">
+      <div class="brand">
+        <span class="mark"><svg width="18" height="18" viewBox="0 0 24 24" class="icon" stroke="#fff" stroke-width="2"><path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18"/></svg></span>
+        Expert<b>IA</b>
+      </div>
+      <p class="footer-tag">La marketplace qui relie les entreprises aux meilleurs experts diplômés en intelligence artificielle.</p>
+    </div>
+    <div>
+      <h5>Entreprises</h5>
+      <a href="experts.html">Trouver un expert</a>
+      <a href="#">Implémenter l'IA</a>
+      <a href="#">Former mes équipes</a>
+      <a href="#">Tarifs</a>
+    </div>
+    <div>
+      <h5>Experts</h5>
+      <a href="inscription.html">Devenir expert</a>
+      <a href="#">Académies partenaires</a>
+      <a href="#">Charte qualité</a>
+      <a href="#">Ressources</a>
+    </div>
+    <div>
+      <h5>Société</h5>
+      <a href="#">À propos</a>
+      <a href="#">Blog</a>
+      <a href="#">Contact</a>
+      <a href="#">Mentions légales</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 ExpertIA — Conçu à Paris.</span>
+    <div class="socials"><span>in</span><span>X</span><span>@</span></div>
+  </div>
+</footer>
+
+</body>
+</html>
